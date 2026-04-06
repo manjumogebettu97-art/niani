@@ -248,6 +248,7 @@
 .world-flow {
   position: relative;
   z-index: 3;
+  padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
 .hero-stage {
@@ -255,7 +256,7 @@
   min-height: 108svh;
   display: grid;
   place-items: center;
-  padding: 6.8rem 1.2rem 3.2rem;
+  padding: 6.8rem clamp(1rem, 3vw, 2rem) 3.2rem;
   overflow: hidden;
 }
 
@@ -356,12 +357,12 @@
 .know-stage,
 .brand-stage,
 .signup-stage {
-  width: min(1160px, 94vw);
+  width: min(1160px, 100%);
   margin: 0 auto;
 }
 
 .film-stage {
-  width: min(880px, 72vw) !important;
+  width: min(880px, 100%) !important;
   padding-top: 0;
 }
 
@@ -877,7 +878,7 @@
   .know-stage,
   .brand-stage,
   .signup-stage {
-    width: 95vw;
+    width: 100%;
   }
 
   .film-card {
@@ -886,7 +887,7 @@
   }
 
   .film-stage {
-    width: 95vw !important;
+    width: 100% !important;
   }
 
 
