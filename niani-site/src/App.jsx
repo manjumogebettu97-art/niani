@@ -293,11 +293,12 @@ function App() {
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.3,
-      lerp: 0.078,
+      duration: 1.6,
+      lerp: 0.1,
       smoothWheel: true,
-      wheelMultiplier: 0.88,
-      touchMultiplier: 0.92,
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.2,
+      infinite: false,
     })
 
     const update = (time) => {
@@ -319,19 +320,19 @@ function App() {
       gsap.set('.floating-world', { autoAlpha: 1 })
 
       gsap.from('.main-nav', {
-        y: -18,
+        y: -24,
         autoAlpha: 0,
-        duration: 1.2,
-        ease: 'power3.out',
+        duration: 1.4,
+        ease: 'power4.out',
       })
 
       gsap.from('[data-hero-reveal]', {
-        y: 20,
+        y: 36,
         autoAlpha: 0,
-        stagger: 0.13,
-        duration: 1.5,
-        delay: 0.2,
-        ease: 'power3.out',
+        stagger: 0.18,
+        duration: 1.6,
+        delay: 0.25,
+        ease: 'power4.out',
       })
 
       const totalItems = floatingRefs.current.filter(Boolean).length
@@ -391,17 +392,46 @@ function App() {
       })
 
       gsap.utils.toArray('[data-reveal-group]').forEach((group) => {
+        const headings = group.querySelectorAll('h2, h3')
+        const paragraphs = group.querySelectorAll('p')
         const targets = group.querySelectorAll('[data-reveal]')
         if (!targets.length) return
+
+        headings.forEach((heading) => {
+          gsap.from(heading, {
+            y: 50,
+            autoAlpha: 0,
+            duration: 1.6,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: heading,
+              start: 'top 88%',
+            },
+          })
+        })
+
+        paragraphs.forEach((p) => {
+          gsap.from(p, {
+            y: 30,
+            autoAlpha: 0,
+            duration: 1.4,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: p,
+              start: 'top 88%',
+            },
+          })
+        })
+
         gsap.from(targets, {
-          y: 28,
+          y: 40,
           autoAlpha: 0,
-          stagger: 0.1,
-          duration: 1.4,
-          ease: 'power3.out',
+          stagger: 0.12,
+          duration: 1.5,
+          ease: 'power4.out',
           scrollTrigger: {
             trigger: group,
-            start: 'top 86%',
+            start: 'top 85%',
           },
         })
       })
@@ -413,7 +443,7 @@ function App() {
           ease: 'none',
           scrollTrigger: {
             trigger: element,
-            scrub: 1.2,
+            scrub: 0.8,
             start: 'top bottom',
             end: 'bottom top',
           },
@@ -428,7 +458,7 @@ function App() {
           trigger: '.hero-stage',
           start: 'top top',
           end: 'bottom 60%',
-          scrub: true,
+          scrub: 0.6,
         },
       })
 
@@ -438,12 +468,12 @@ function App() {
         {
           scale: 1,
           borderRadius: '18px',
-          ease: 'power1.out',
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: '.film-stage',
             start: 'top 95%',
             end: 'top 30%',
-            scrub: 1,
+            scrub: 0.8,
           },
         },
       )
@@ -486,6 +516,31 @@ function App() {
             gsap.set(item, { x, y, rotation: rot })
           })
         },
+      })
+
+      gsap.from('.wordmark', {
+        scale: 0.85,
+        autoAlpha: 0,
+        duration: 2,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.wordmark',
+          start: 'top 92%',
+        },
+      })
+
+      gsap.utils.toArray('.brand-logos span').forEach((span, i) => {
+        gsap.from(span, {
+          y: 20,
+          autoAlpha: 0,
+          duration: 0.8,
+          delay: i * 0.06,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.brand-logos',
+            start: 'top 88%',
+          },
+        })
       })
     }, shellRef)
 
