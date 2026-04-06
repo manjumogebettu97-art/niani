@@ -597,8 +597,7 @@ function App() {
         </div>
 
         <div className="nav-right">
-          <a className="nav-link nav-link--muted" href="#signup">Login</a>
-          <a className="nav-cta" href="#signup">Sign up</a>
+          <a className="nav-cta" href="#signup">Get Quote</a>
         </div>
 
         <button
@@ -616,8 +615,7 @@ function App() {
         <div className="mobile-menu" onClick={() => setMenuOpen(false)}>
           <a href="#hero">Explore</a>
           <a href="#think">Curate</a>
-          <a href="#signup">Login</a>
-          <a className="mobile-menu__cta" href="#signup">Sign up</a>
+          <a className="mobile-menu__cta" href="#signup">Get Quote</a>
         </div>
       )}
 
