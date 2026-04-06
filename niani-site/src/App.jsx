@@ -505,14 +505,14 @@ function App() {
   return (
     <div className="niani-shell" ref={shellRef}>
       <div className={`splash-screen${loading ? '' : ' splash-screen--done'}`}>
-        <img src="/niani-logo.jpeg" alt="Niani Designs" className="splash-logo" />
+        <img src={`${import.meta.env.BASE_URL}niani-logo.jpeg`} alt="Niani Designs" className="splash-logo" />
         <span className="splash-name">NIANI</span>
       </div>
 
       <header className="main-nav">
         <div className="nav-chip-group">
           <a className="nav-brand" href="/" aria-label="Niani Designs home">
-            <img src="/niani-logo.jpeg" alt="" />
+            <img src={`${import.meta.env.BASE_URL}niani-logo.jpeg`} alt="" />
           </a>
           <a className="nav-chip link-hover" href="#hero">
             Explore
@@ -629,7 +629,7 @@ function App() {
               loop
               playsInline
               preload="auto"
-              src="/niani-video.mp4"
+              src={`${import.meta.env.BASE_URL}niani-video.mp4`}
             />
             <div className="film-overlay">
               <div className="film-overlay__left">
