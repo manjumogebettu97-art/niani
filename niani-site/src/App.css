@@ -375,6 +375,7 @@
   box-shadow: 0 16px 48px rgba(80, 3, 12, 0.16);
   transform-origin: center;
   will-change: transform, border-radius;
+  background: #000;
 }
 
 .film-overlay {
@@ -386,17 +387,20 @@
   justify-content: space-between;
   padding: 0 clamp(1rem, 3vw, 2rem);
   pointer-events: none;
+  background: none;
 }
 
 .film-overlay__left {
   display: flex;
   align-items: center;
   gap: clamp(0.5rem, 1.5vw, 1rem);
+  background: none;
 }
 
 .film-overlay__play {
   font-size: clamp(1.2rem, 2.8vw, 2.2rem);
   color: rgba(255, 255, 255, 0.9);
+  background: none;
 }
 
 .film-overlay__text {
