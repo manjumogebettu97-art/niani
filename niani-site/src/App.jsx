@@ -275,30 +275,10 @@ const brandNames = [
 function App() {
   const shellRef = useRef(null)
   const floatingRefs = useRef([])
-  const masonryRef = useRef(null)
-  const layoutMasonryRef = useRef(null)
+  const rafRef = useRef(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [scrolled, setScrolled] = useState(false)
-  const [lightboxSrc, setLightboxSrc] = useState(null)
-
-  const handleImgLoad = (e) => {
-    const img = e.target
-    if (img.decode) {
-      img.decode().then(() => {
-        img.style.willChange = 'filter'
-        img.classList.add('loaded')
-        img.addEventListener('transitionend', () => {
-          img.style.willChange = 'auto'
-        }, { once: true })
-        layoutMasonryRef.current?.()
-      }).catch(() => {
-        img.classList.add('loaded')
-      })
-    } else {
-      img.classList.add('loaded')
-    }
-  }
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2200)
@@ -306,34 +286,36 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
+    const onScroll = () => setScrolled(window.scrollY > 30)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.5,
-      lerp: 0.08,
+      duration: 1.6,
+      lerp: 0.1,
       smoothWheel: true,
       wheelMultiplier: 0.95,
-      touchMultiplier: 0,
+      touchMultiplier: 1.2,
       infinite: false,
     })
 
+    const update = (time) => {
+      lenis.raf(time)
+      rafRef.current = requestAnimationFrame(update)
+    }
+
     lenis.on('scroll', ScrollTrigger.update)
-    const lenisRaf = (time) => lenis.raf(time * 1000)
-    gsap.ticker.add(lenisRaf)
-    gsap.ticker.lagSmoothing(0)
+    rafRef.current = requestAnimationFrame(update)
 
     return () => {
-      gsap.ticker.remove(lenisRaf)
+      cancelAnimationFrame(rafRef.current)
       lenis.destroy()
     }
   }, [])
 
   useEffect(() => {
-    let masonryRo
     const ctx = gsap.context(() => {
       gsap.set('.floating-world', { autoAlpha: 1 })
 
@@ -345,10 +327,10 @@ function App() {
       })
 
       gsap.from('[data-hero-reveal]', {
-        y: 40,
+        y: 36,
         autoAlpha: 0,
-        stagger: 0.15,
-        duration: 1.2,
+        stagger: 0.18,
+        duration: 1.6,
         delay: 0.25,
         ease: 'power4.out',
       })
@@ -440,63 +422,6 @@ function App() {
             },
           })
         })
-      })
-
-      gsap.set('.grid-item', { autoAlpha: 0, y: 60, scale: 0.97 })
-
-      /* ── Masonry Layout (JS absolute-positioning) ── */
-      const masonryContainer = masonryRef.current
-      if (masonryContainer) {
-        const layoutMasonry = () => {
-          const cards = [...masonryContainer.children]
-          if (!cards.length) return
-          const w = masonryContainer.offsetWidth
-          const cols = window.innerWidth <= 760 ? 2 : 4
-          const gap = window.innerWidth <= 760 ? 12 : 24
-          const colW = (w - gap * (cols - 1)) / cols
-          const colH = new Array(cols).fill(0)
-
-          cards.forEach((card) => {
-            card.style.position = 'absolute'
-            card.style.width = `${colW}px`
-            const s = colH.indexOf(Math.min(...colH))
-            card.style.left = `${s * (colW + gap)}px`
-            card.style.top = `${colH[s]}px`
-            colH[s] += card.offsetHeight + gap
-          })
-
-          masonryContainer.style.height = `${Math.max(...colH)}px`
-        }
-
-        layoutMasonryRef.current = layoutMasonry
-        requestAnimationFrame(layoutMasonry)
-
-        masonryRo = new ResizeObserver(() => requestAnimationFrame(layoutMasonry))
-        masonryRo.observe(masonryContainer)
-      }
-
-      ScrollTrigger.batch('.grid-item', {
-        onEnter: (batch) =>
-          gsap.to(batch, {
-            y: 0,
-            scale: 1,
-            autoAlpha: 1,
-            duration: 0.85,
-            stagger: 0.08,
-            ease: 'power3.out',
-            overwrite: true,
-          }),
-        onLeaveBack: (batch) =>
-          gsap.to(batch, {
-            y: 60,
-            scale: 0.97,
-            autoAlpha: 0,
-            duration: 0.85,
-            stagger: 0.08,
-            ease: 'power3.out',
-            overwrite: true,
-          }),
-        start: 'top 85%',
       })
 
       gsap.utils.toArray('[data-parallax]').forEach((element) => {
@@ -622,7 +547,6 @@ function App() {
 
     return () => {
       window.removeEventListener('pointermove', handlePointer)
-      masonryRo?.disconnect()
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
     }
@@ -635,7 +559,7 @@ function App() {
         <span className="splash-name">NIANI</span>
       </div>
 
-      <header className={`main-nav${scrolled ? ' is-scrolled' : ''}`}>
+      <header className={`main-nav${scrolled ? ' main-nav--scrolled' : ''}`}>
         <div className="nav-left">
           <a className="nav-brand" href="/" aria-label="Niani Designs home">
             <img src={`${import.meta.env.BASE_URL}niani-logo.jpeg`} alt="" />
@@ -705,7 +629,7 @@ function App() {
             >
               <div className="floating-object__inner">
                 {item.type === 'image' ? (
-                  <img src={item.src} alt="" loading="lazy" className="lazy-img" onLoad={handleImgLoad} />
+                  <img src={item.src} alt="" loading="lazy" />
                 ) : (
                   <div className="floating-object__surface" style={item.style} />
                 )}
@@ -781,24 +705,18 @@ function App() {
               alt="Material inspiration left"
               loading="lazy"
               data-parallax="-5"
-              className="lazy-img"
-              onLoad={handleImgLoad}
             />
             <img
               src="https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200"
               alt="Material inspiration center"
               loading="lazy"
               data-parallax="-5"
-              className="lazy-img"
-              onLoad={handleImgLoad}
             />
             <img
               src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200"
               alt="Material inspiration right"
               loading="lazy"
               data-parallax="-5"
-              className="lazy-img"
-              onLoad={handleImgLoad}
             />
             <div className="world-strip__search">future home</div>
           </div>
@@ -812,17 +730,11 @@ function App() {
           </p>
           <h2 data-reveal>Search the way you think.</h2>
 
-          <div className="think-grid" ref={masonryRef}>
+          <div className="think-grid">
             {thinkCards.map((card) => (
-              <article key={card.id} className="think-card grid-item" onClick={() => setLightboxSrc(card.image)}>
+              <article key={card.id} className="think-card grid-item" data-reveal>
                 <div className="think-card__media">
-                  <img src={card.image} alt={card.title} loading="lazy" data-parallax="-6" className="lazy-img" onLoad={handleImgLoad} />
-                  <div className="card-overlay">
-                    <div className="card-actions">
-                      <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Save</button>
-                      <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Share</button>
-                    </div>
-                  </div>
+                  <img src={card.image} alt={card.title} loading="lazy" data-parallax="-6" />
                 </div>
                 <span>{card.title}</span>
               </article>
@@ -840,22 +752,14 @@ function App() {
               looking at.
             </h2>
 
-            <article className="know-card grid-item" onClick={() => setLightboxSrc('https://images.pexels.com/photos/1648768/pexels-photo-1648768.jpeg?auto=compress&cs=tinysrgb&w=1300')}>
+            <article className="know-card grid-item" data-reveal>
               <img
                 src="https://images.pexels.com/photos/1648768/pexels-photo-1648768.jpeg?auto=compress&cs=tinysrgb&w=1300"
                 alt="Editorial interior source card"
                 loading="lazy"
                 data-parallax="-8"
-                className="lazy-img"
-                onLoad={handleImgLoad}
               />
               <span>Editorial details by Niani</span>
-              <div className="card-overlay">
-                <div className="card-actions">
-                  <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Save</button>
-                  <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Share</button>
-                </div>
-              </div>
             </article>
 
             <p data-reveal>
@@ -892,12 +796,6 @@ function App() {
           <div className="wordmark" aria-hidden="true">NIANI</div>
         </section>
       </main>
-
-      {lightboxSrc && (
-        <div className="lightbox" onClick={() => setLightboxSrc(null)}>
-          <img src={lightboxSrc} alt="" className="lightbox__img" />
-        </div>
-      )}
     </div>
   )
 }
