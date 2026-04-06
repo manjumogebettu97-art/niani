@@ -344,17 +344,29 @@ function App() {
 
         gsap.from(item, {
           autoAlpha: 0,
-          scale: 0.88,
-          duration: 1.9,
+          scale: 0.85,
+          y: gsap.utils.random(15, 35),
+          duration: 2.2,
           ease: 'power3.out',
-          delay: 0.25 + index * 0.028,
+          delay: 0.3 + index * 0.06,
+        })
+
+        gsap.to(item, {
+          y: `+=${gsap.utils.random(-12, 12)}`,
+          x: `+=${gsap.utils.random(-10, 10)}`,
+          rotation: `+=${gsap.utils.random(-2, 2)}`,
+          duration: gsap.utils.random(8, 16),
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: 2.5 + index * 0.06,
         })
 
         orbits.push({
           item,
           offset: (index / totalItems) * Math.PI * 2,
-          radiusX: 120 + index * 28 * depth,
-          radiusY: 70 + index * 18 * depth,
+          radiusX: 30 + index * 8 * depth,
+          radiusY: 20 + index * 5 * depth,
           direction: index % 2 === 0 ? 1 : -1,
           depth,
         })
