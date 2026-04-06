@@ -248,7 +248,6 @@
 .world-flow {
   position: relative;
   z-index: 3;
-  padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
 .hero-stage {
@@ -359,6 +358,7 @@
 .signup-stage {
   width: min(1160px, 100%);
   margin: 0 auto;
+  padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
 .film-stage {
@@ -399,9 +399,11 @@
 }
 
 .film-overlay__play {
-  font-size: clamp(1.2rem, 2.8vw, 2.2rem);
+  width: clamp(1.2rem, 2.8vw, 2.2rem);
+  height: clamp(1.2rem, 2.8vw, 2.2rem);
   color: rgba(255, 255, 255, 0.9);
   background: none;
+  flex-shrink: 0;
 }
 
 .film-overlay__text {

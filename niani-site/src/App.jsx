@@ -640,7 +640,7 @@ function App() {
             />
             <div className="film-overlay">
               <div className="film-overlay__left">
-                <span className="film-overlay__play">&#9654;</span>
+                <svg className="film-overlay__play" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
                 <span className="film-overlay__text">Watch</span>
               </div>
               <span className="film-overlay__text film-overlay__right">the film</span>
