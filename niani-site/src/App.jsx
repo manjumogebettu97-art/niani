@@ -392,47 +392,23 @@ function App() {
       })
 
       gsap.utils.toArray('[data-reveal-group]').forEach((group) => {
-        const headings = group.querySelectorAll('h2, h3')
-        const paragraphs = group.querySelectorAll('p')
         const targets = group.querySelectorAll('[data-reveal]')
         if (!targets.length) return
 
-        headings.forEach((heading) => {
-          gsap.from(heading, {
-            y: 50,
+        targets.forEach((target, i) => {
+          const isHeading = target.matches('h2, h3')
+          const isParagraph = target.matches('p')
+          gsap.from(target, {
+            y: isHeading ? 50 : isParagraph ? 30 : 40,
             autoAlpha: 0,
-            duration: 1.6,
+            duration: isHeading ? 1.6 : isParagraph ? 1.4 : 1.5,
+            delay: i * 0.1,
             ease: 'power4.out',
             scrollTrigger: {
-              trigger: heading,
-              start: 'top 88%',
+              trigger: target,
+              start: 'top 90%',
             },
           })
-        })
-
-        paragraphs.forEach((p) => {
-          gsap.from(p, {
-            y: 30,
-            autoAlpha: 0,
-            duration: 1.4,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: p,
-              start: 'top 88%',
-            },
-          })
-        })
-
-        gsap.from(targets, {
-          y: 40,
-          autoAlpha: 0,
-          stagger: 0.12,
-          duration: 1.5,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: group,
-            start: 'top 85%',
-          },
         })
       })
 
