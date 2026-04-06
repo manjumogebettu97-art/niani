@@ -275,13 +275,30 @@ const brandNames = [
 function App() {
   const shellRef = useRef(null)
   const floatingRefs = useRef([])
-  const rafRef = useRef(0)
+  const masonryRef = useRef(null)
+  const layoutMasonryRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [scrolled, setScrolled] = useState(false)
   const [lightboxSrc, setLightboxSrc] = useState(null)
 
-  const handleImgLoad = (e) => e.target.classList.add('loaded')
+  const handleImgLoad = (e) => {
+    const img = e.target
+    if (img.decode) {
+      img.decode().then(() => {
+        img.style.willChange = 'filter'
+        img.classList.add('loaded')
+        img.addEventListener('transitionend', () => {
+          img.style.willChange = 'auto'
+        }, { once: true })
+        layoutMasonryRef.current?.()
+      }).catch(() => {
+        img.classList.add('loaded')
+      })
+    } else {
+      img.classList.add('loaded')
+    }
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2200)
@@ -304,21 +321,19 @@ function App() {
       infinite: false,
     })
 
-    const update = (time) => {
-      lenis.raf(time)
-      rafRef.current = requestAnimationFrame(update)
-    }
-
     lenis.on('scroll', ScrollTrigger.update)
-    rafRef.current = requestAnimationFrame(update)
+    const lenisRaf = (time) => lenis.raf(time * 1000)
+    gsap.ticker.add(lenisRaf)
+    gsap.ticker.lagSmoothing(0)
 
     return () => {
-      cancelAnimationFrame(rafRef.current)
+      gsap.ticker.remove(lenisRaf)
       lenis.destroy()
     }
   }, [])
 
   useEffect(() => {
+    let masonryRo
     const ctx = gsap.context(() => {
       gsap.set('.floating-world', { autoAlpha: 1 })
 
@@ -428,6 +443,37 @@ function App() {
       })
 
       gsap.set('.grid-item', { autoAlpha: 0, y: 60, scale: 0.97 })
+
+      /* ── Masonry Layout (JS absolute-positioning) ── */
+      const masonryContainer = masonryRef.current
+      if (masonryContainer) {
+        const layoutMasonry = () => {
+          const cards = [...masonryContainer.children]
+          if (!cards.length) return
+          const w = masonryContainer.offsetWidth
+          const cols = window.innerWidth <= 760 ? 2 : 4
+          const gap = window.innerWidth <= 760 ? 12 : 24
+          const colW = (w - gap * (cols - 1)) / cols
+          const colH = new Array(cols).fill(0)
+
+          cards.forEach((card) => {
+            card.style.position = 'absolute'
+            card.style.width = `${colW}px`
+            const s = colH.indexOf(Math.min(...colH))
+            card.style.left = `${s * (colW + gap)}px`
+            card.style.top = `${colH[s]}px`
+            colH[s] += card.offsetHeight + gap
+          })
+
+          masonryContainer.style.height = `${Math.max(...colH)}px`
+        }
+
+        layoutMasonryRef.current = layoutMasonry
+        requestAnimationFrame(layoutMasonry)
+
+        masonryRo = new ResizeObserver(() => requestAnimationFrame(layoutMasonry))
+        masonryRo.observe(masonryContainer)
+      }
 
       ScrollTrigger.batch('.grid-item', {
         onEnter: (batch) =>
@@ -576,6 +622,7 @@ function App() {
 
     return () => {
       window.removeEventListener('pointermove', handlePointer)
+      masonryRo?.disconnect()
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
     }
@@ -588,7 +635,7 @@ function App() {
         <span className="splash-name">NIANI</span>
       </div>
 
-      <header className={`main-nav${scrolled ? ' main-nav--scrolled' : ''}`}>
+      <header className={`main-nav${scrolled ? ' is-scrolled' : ''}`}>
         <div className="nav-left">
           <a className="nav-brand" href="/" aria-label="Niani Designs home">
             <img src={`${import.meta.env.BASE_URL}niani-logo.jpeg`} alt="" />
@@ -765,7 +812,7 @@ function App() {
           </p>
           <h2 data-reveal>Search the way you think.</h2>
 
-          <div className="think-grid">
+          <div className="think-grid" ref={masonryRef}>
             {thinkCards.map((card) => (
               <article key={card.id} className="think-card grid-item" onClick={() => setLightboxSrc(card.image)}>
                 <div className="think-card__media">
