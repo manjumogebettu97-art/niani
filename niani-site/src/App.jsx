@@ -279,6 +279,9 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [scrolled, setScrolled] = useState(false)
+  const [lightboxSrc, setLightboxSrc] = useState(null)
+
+  const handleImgLoad = (e) => e.target.classList.add('loaded')
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2200)
@@ -286,18 +289,18 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30)
+    const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.6,
-      lerp: 0.1,
+      duration: 1.5,
+      lerp: 0.08,
       smoothWheel: true,
       wheelMultiplier: 0.95,
-      touchMultiplier: 1.2,
+      touchMultiplier: 0,
       infinite: false,
     })
 
@@ -327,10 +330,10 @@ function App() {
       })
 
       gsap.from('[data-hero-reveal]', {
-        y: 36,
+        y: 40,
         autoAlpha: 0,
-        stagger: 0.18,
-        duration: 1.6,
+        stagger: 0.15,
+        duration: 1.2,
         delay: 0.25,
         ease: 'power4.out',
       })
@@ -422,6 +425,32 @@ function App() {
             },
           })
         })
+      })
+
+      gsap.set('.grid-item', { autoAlpha: 0, y: 60, scale: 0.97 })
+
+      ScrollTrigger.batch('.grid-item', {
+        onEnter: (batch) =>
+          gsap.to(batch, {
+            y: 0,
+            scale: 1,
+            autoAlpha: 1,
+            duration: 0.85,
+            stagger: 0.08,
+            ease: 'power3.out',
+            overwrite: true,
+          }),
+        onLeaveBack: (batch) =>
+          gsap.to(batch, {
+            y: 60,
+            scale: 0.97,
+            autoAlpha: 0,
+            duration: 0.85,
+            stagger: 0.08,
+            ease: 'power3.out',
+            overwrite: true,
+          }),
+        start: 'top 85%',
       })
 
       gsap.utils.toArray('[data-parallax]').forEach((element) => {
@@ -629,7 +658,7 @@ function App() {
             >
               <div className="floating-object__inner">
                 {item.type === 'image' ? (
-                  <img src={item.src} alt="" loading="lazy" />
+                  <img src={item.src} alt="" loading="lazy" className="lazy-img" onLoad={handleImgLoad} />
                 ) : (
                   <div className="floating-object__surface" style={item.style} />
                 )}
@@ -705,18 +734,24 @@ function App() {
               alt="Material inspiration left"
               loading="lazy"
               data-parallax="-5"
+              className="lazy-img"
+              onLoad={handleImgLoad}
             />
             <img
               src="https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200"
               alt="Material inspiration center"
               loading="lazy"
               data-parallax="-5"
+              className="lazy-img"
+              onLoad={handleImgLoad}
             />
             <img
               src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200"
               alt="Material inspiration right"
               loading="lazy"
               data-parallax="-5"
+              className="lazy-img"
+              onLoad={handleImgLoad}
             />
             <div className="world-strip__search">future home</div>
           </div>
@@ -732,9 +767,15 @@ function App() {
 
           <div className="think-grid">
             {thinkCards.map((card) => (
-              <article key={card.id} className="think-card grid-item" data-reveal>
+              <article key={card.id} className="think-card grid-item" onClick={() => setLightboxSrc(card.image)}>
                 <div className="think-card__media">
-                  <img src={card.image} alt={card.title} loading="lazy" data-parallax="-6" />
+                  <img src={card.image} alt={card.title} loading="lazy" data-parallax="-6" className="lazy-img" onLoad={handleImgLoad} />
+                  <div className="card-overlay">
+                    <div className="card-actions">
+                      <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Save</button>
+                      <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Share</button>
+                    </div>
+                  </div>
                 </div>
                 <span>{card.title}</span>
               </article>
@@ -752,14 +793,22 @@ function App() {
               looking at.
             </h2>
 
-            <article className="know-card grid-item" data-reveal>
+            <article className="know-card grid-item" onClick={() => setLightboxSrc('https://images.pexels.com/photos/1648768/pexels-photo-1648768.jpeg?auto=compress&cs=tinysrgb&w=1300')}>
               <img
                 src="https://images.pexels.com/photos/1648768/pexels-photo-1648768.jpeg?auto=compress&cs=tinysrgb&w=1300"
                 alt="Editorial interior source card"
                 loading="lazy"
                 data-parallax="-8"
+                className="lazy-img"
+                onLoad={handleImgLoad}
               />
               <span>Editorial details by Niani</span>
+              <div className="card-overlay">
+                <div className="card-actions">
+                  <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Save</button>
+                  <button className="card-action-pill" onClick={(e) => e.stopPropagation()}>Share</button>
+                </div>
+              </div>
             </article>
 
             <p data-reveal>
@@ -796,6 +845,12 @@ function App() {
           <div className="wordmark" aria-hidden="true">NIANI</div>
         </section>
       </main>
+
+      {lightboxSrc && (
+        <div className="lightbox" onClick={() => setLightboxSrc(null)}>
+          <img src={lightboxSrc} alt="" className="lightbox__img" />
+        </div>
+      )}
     </div>
   )
 }
