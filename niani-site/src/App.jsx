@@ -572,26 +572,33 @@ function App() {
       </div>
 
       <header className={`main-nav${scrolled ? ' main-nav--scrolled' : ''}`}>
-        <div className="nav-chip-group">
+        <div className="nav-left">
           <a className="nav-brand" href="/" aria-label="Niani Designs home">
             <img src={`${import.meta.env.BASE_URL}niani-logo.jpeg`} alt="" />
           </a>
-          <a className="nav-chip link-hover" href="#hero">
-            Explore
-          </a>
-          <a className="nav-chip link-hover" href="#think">
-            Curate
-          </a>
+          <a className="nav-link" href="#hero">Explore</a>
+          <a className="nav-link" href="#think">Curate</a>
         </div>
 
-        <button className="nav-search" type="button" aria-label="Search Niani inspirations">
-          Search Niani inspirations...
-        </button>
+        <div className="nav-search-wrap">
+          <svg className="nav-search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="8.5" cy="8.5" r="5.5" />
+            <line x1="13" y1="13" x2="17" y2="17" />
+          </svg>
+          <input
+            className="nav-search"
+            type="text"
+            placeholder="Search Niani inspirations..."
+            aria-label="Search Niani inspirations"
+          />
+          <span className="nav-search-dots" aria-hidden="true">
+            <span /><span /><span /><span />
+          </span>
+        </div>
 
-        <div className="nav-chip-group nav-chip-group--right">
-          <a className="nav-cta cta-button" href="#signup">
-            Get Quote
-          </a>
+        <div className="nav-right">
+          <a className="nav-link nav-link--muted" href="#signup">Login</a>
+          <a className="nav-cta" href="#signup">Sign up</a>
         </div>
 
         <button
@@ -609,7 +616,8 @@ function App() {
         <div className="mobile-menu" onClick={() => setMenuOpen(false)}>
           <a href="#hero">Explore</a>
           <a href="#think">Curate</a>
-          <a className="mobile-menu__cta" href="#signup">Get Quote</a>
+          <a href="#signup">Login</a>
+          <a className="mobile-menu__cta" href="#signup">Sign up</a>
         </div>
       )}
 
