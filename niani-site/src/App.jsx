@@ -278,10 +278,17 @@ function App() {
   const rafRef = useRef(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2200)
     return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
@@ -509,7 +516,7 @@ function App() {
         <span className="splash-name">NIANI</span>
       </div>
 
-      <header className="main-nav">
+      <header className={`main-nav${scrolled ? ' main-nav--scrolled' : ''}`}>
         <div className="nav-chip-group">
           <a className="nav-brand" href="/" aria-label="Niani Designs home">
             <img src={`${import.meta.env.BASE_URL}niani-logo.jpeg`} alt="" />
