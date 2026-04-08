@@ -605,8 +605,30 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.think-carousel {
+  margin-top: 1.75rem;
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.think-carousel__track {
+  display: flex;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.think-carousel__track--instant {
+  transition: none;
+}
+
 .think-card {
   position: relative;
+}
+
+.think-carousel__card {
+  flex: 0 0 100%;
+  padding-inline: clamp(0.35rem, 1.2vw, 1rem);
 }
 
 .think-card__media {
@@ -1001,6 +1023,10 @@
   .think-grid {
     grid-template-columns: 1fr;
     gap: 2.6rem;
+  }
+
+  .think-carousel {
+    margin-top: 1.45rem;
   }
 
   .think-card__media {

@@ -332,6 +332,14 @@ const worldStripSlides = [
 const WORLD_SLIDE_INTERVAL = 5000
 const WORLD_SLIDE_TRANSITION = 850
 const WORLD_COLUMN_STAGGER = 1000
+const THINK_SLIDE_INTERVAL = 3200
+const THINK_SLIDE_TRANSITION = 700
+const THINK_CAROUSEL_BREAKPOINT = '(max-width: 760px)'
+
+const getIsMobileThinkCarousel = () => {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia(THINK_CAROUSEL_BREAKPOINT).matches
+}
 
 function App() {
   const shellRef = useRef(null)
@@ -342,11 +350,64 @@ function App() {
   const [scrolled, setScrolled] = useState(false)
   const [worldSlideIndex, setWorldSlideIndex] = useState(0)
   const [worldSlideInstant, setWorldSlideInstant] = useState(false)
+  const [thinkSlideIndex, setThinkSlideIndex] = useState(0)
+  const [thinkSlideInstant, setThinkSlideInstant] = useState(false)
+  const [thinkCarouselPaused, setThinkCarouselPaused] = useState(false)
+  const [isMobileThinkCarousel, setIsMobileThinkCarousel] = useState(getIsMobileThinkCarousel)
 
   const worldSlidesWithLoop = [...worldStripSlides, worldStripSlides[0]]
   const worldColumnCount = worldStripSlides[0].images.length
   const worldSlidePercent = 100 / worldSlidesWithLoop.length
   const activeWorldSlide = worldStripSlides[worldSlideIndex % worldStripSlides.length]
+  const thinkSlidesWithLoop = [...thinkCards, thinkCards[0]]
+
+  useEffect(() => {
+    const media = window.matchMedia(THINK_CAROUSEL_BREAKPOINT)
+    const handleChange = (event) => {
+      const nextIsMobile = event.matches
+      setIsMobileThinkCarousel(nextIsMobile)
+      if (!nextIsMobile) {
+        setThinkCarouselPaused(false)
+        setThinkSlideInstant(false)
+        setThinkSlideIndex(0)
+      }
+    }
+
+    media.addEventListener('change', handleChange)
+
+    return () => media.removeEventListener('change', handleChange)
+  }, [])
+
+  useEffect(() => {
+    if (!isMobileThinkCarousel || thinkCarouselPaused) return
+
+    const ticker = setInterval(() => {
+      setThinkSlideIndex((current) => current + 1)
+    }, THINK_SLIDE_INTERVAL)
+
+    return () => clearInterval(ticker)
+  }, [isMobileThinkCarousel, thinkCarouselPaused])
+
+  useEffect(() => {
+    if (!isMobileThinkCarousel || thinkSlideIndex < thinkCards.length) return
+
+    const resetTimer = setTimeout(() => {
+      setThinkSlideInstant(true)
+      setThinkSlideIndex(0)
+    }, THINK_SLIDE_TRANSITION + 60)
+
+    return () => clearTimeout(resetTimer)
+  }, [isMobileThinkCarousel, thinkSlideIndex])
+
+  useEffect(() => {
+    if (!isMobileThinkCarousel || !thinkSlideInstant) return
+
+    const rafId = requestAnimationFrame(() => {
+      setThinkSlideInstant(false)
+    })
+
+    return () => cancelAnimationFrame(rafId)
+  }, [isMobileThinkCarousel, thinkSlideInstant])
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2200)
@@ -807,9 +868,6 @@ function App() {
               <span>for interior inspiration.</span>
             </h1>
             <div className="hero-actions" data-hero-reveal>
-              <a className="hero-pill cta-button" href="#signup">
-                Get Quote
-              </a>
               <a className="hero-link link-hover" href="#film">
                 Get the quote
               </a>
@@ -878,16 +936,42 @@ function App() {
           </p>
           <h2 data-reveal>Search the way you think.</h2>
 
-          <div className="think-grid">
-            {thinkCards.map((card) => (
-              <article key={card.id} className="think-card grid-item" data-reveal>
-                <div className="think-card__media">
-                  <img src={card.image} alt={card.title} loading="lazy" data-parallax="-6" />
-                </div>
-                <span>{card.title}</span>
-              </article>
-            ))}
-          </div>
+          {isMobileThinkCarousel ? (
+            <div
+              className="think-carousel"
+              data-reveal
+              onMouseEnter={() => setThinkCarouselPaused(true)}
+              onMouseLeave={() => setThinkCarouselPaused(false)}
+              onTouchStart={() => setThinkCarouselPaused(true)}
+            >
+              <div
+                className={`think-carousel__track${thinkSlideInstant ? ' think-carousel__track--instant' : ''}`}
+                style={{
+                  transform: `translateX(-${thinkSlideIndex * 100}%)`,
+                }}
+              >
+                {thinkSlidesWithLoop.map((card, index) => (
+                  <article key={`${card.id}-${index}`} className="think-card grid-item think-carousel__card">
+                    <div className="think-card__media">
+                      <img src={card.image} alt={card.title} loading="lazy" data-parallax="-6" />
+                    </div>
+                    <span>{card.title}</span>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="think-grid">
+              {thinkCards.map((card) => (
+                <article key={card.id} className="think-card grid-item" data-reveal>
+                  <div className="think-card__media">
+                    <img src={card.image} alt={card.title} loading="lazy" data-parallax="-6" />
+                  </div>
+                  <span>{card.title}</span>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="know-stage" data-reveal-group>
