@@ -867,11 +867,6 @@ function App() {
               <span>Your space</span>
               <span>for interior inspiration.</span>
             </h1>
-            <div className="hero-actions" data-hero-reveal>
-              <a className="hero-link link-hover" href="#film">
-                Get the quote
-              </a>
-            </div>
           </div>
         </section>
 
