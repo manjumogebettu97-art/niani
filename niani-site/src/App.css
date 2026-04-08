@@ -733,8 +733,23 @@
 }
 
 .brand-stage {
+  position: relative;
+  isolation: isolate;
   padding-top: clamp(3.9rem, 8vw, 5rem);
   text-align: center;
+}
+
+.brand-stage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% -35%, rgba(255, 255, 255, 0.72), rgba(246, 237, 220, 0.94) 48%, rgba(241, 229, 207, 0.98) 100%);
 }
 
 .brand-stage h3 {
@@ -779,12 +794,27 @@
 }
 
 .signup-stage {
+  position: relative;
+  isolation: isolate;
   min-height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding-block: clamp(3rem, 7vw, 5rem);
+}
+
+.signup-stage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(241, 229, 207, 0.98) 0%, rgba(234, 219, 192, 0.98) 100%);
 }
 
 .signup-core {
