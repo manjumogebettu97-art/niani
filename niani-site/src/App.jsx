@@ -272,6 +272,67 @@ const brandNames = [
   'Audo',
 ]
 
+const worldStripSlides = [
+  {
+    id: 'modular-kitchen',
+    keyword: 'modular kitchen',
+    images: [
+      {
+        src: 'https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Modular kitchen inspiration left',
+      },
+      {
+        src: 'https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Modular kitchen inspiration center',
+      },
+      {
+        src: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Modular kitchen inspiration right',
+      },
+    ],
+  },
+  {
+    id: 'renovation',
+    keyword: 'renovation',
+    images: [
+      {
+        src: 'https://images.pexels.com/photos/1648768/pexels-photo-1648768.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Renovation inspiration left',
+      },
+      {
+        src: 'https://images.pexels.com/photos/271743/pexels-photo-271743.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Renovation inspiration center',
+      },
+      {
+        src: 'https://images.pexels.com/photos/2062426/pexels-photo-2062426.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Renovation inspiration right',
+      },
+    ],
+  },
+  {
+    id: 'pooja-room',
+    keyword: 'pooja room',
+    images: [
+      {
+        src: 'https://images.pexels.com/photos/6585754/pexels-photo-6585754.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Pooja room inspiration left',
+      },
+      {
+        src: 'https://images.pexels.com/photos/2082090/pexels-photo-2082090.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Pooja room inspiration center',
+      },
+      {
+        src: 'https://images.pexels.com/photos/1571468/pexels-photo-1571468.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        alt: 'Pooja room inspiration right',
+      },
+    ],
+  },
+]
+
+const WORLD_SLIDE_INTERVAL = 5000
+const WORLD_SLIDE_TRANSITION = 850
+const WORLD_COLUMN_STAGGER = 1000
+
 function App() {
   const shellRef = useRef(null)
   const floatingRefs = useRef([])
@@ -279,6 +340,13 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [scrolled, setScrolled] = useState(false)
+  const [worldSlideIndex, setWorldSlideIndex] = useState(0)
+  const [worldSlideInstant, setWorldSlideInstant] = useState(false)
+
+  const worldSlidesWithLoop = [...worldStripSlides, worldStripSlides[0]]
+  const worldColumnCount = worldStripSlides[0].images.length
+  const worldSlidePercent = 100 / worldSlidesWithLoop.length
+  const activeWorldSlide = worldStripSlides[worldSlideIndex % worldStripSlides.length]
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2200)
@@ -290,6 +358,36 @@ function App() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    const ticker = setInterval(() => {
+      setWorldSlideIndex((current) => current + 1)
+    }, WORLD_SLIDE_INTERVAL)
+
+    return () => clearInterval(ticker)
+  }, [])
+
+  useEffect(() => {
+    if (worldSlideIndex < worldStripSlides.length) return
+
+    const resetDelay = WORLD_SLIDE_TRANSITION + WORLD_COLUMN_STAGGER * (worldColumnCount - 1) + 120
+    const resetTimer = setTimeout(() => {
+      setWorldSlideInstant(true)
+      setWorldSlideIndex(0)
+    }, resetDelay)
+
+    return () => clearTimeout(resetTimer)
+  }, [worldSlideIndex, worldColumnCount])
+
+  useEffect(() => {
+    if (!worldSlideInstant) return
+
+    const rafId = requestAnimationFrame(() => {
+      setWorldSlideInstant(false)
+    })
+
+    return () => cancelAnimationFrame(rafId)
+  }, [worldSlideInstant])
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -466,6 +564,62 @@ function App() {
         },
       )
 
+      const isMobileViewport = window.matchMedia('(max-width: 760px)').matches
+
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: '.world-stage',
+          start: 'top 90%',
+          end: 'top 42%',
+          scrub: 1,
+        },
+      })
+        .to(
+          '.film-card',
+          {
+            y: isMobileViewport ? -26 : -64,
+            scale: isMobileViewport ? 0.95 : 0.9,
+            autoAlpha: isMobileViewport ? 0.74 : 0.58,
+            filter: isMobileViewport ? 'blur(1.2px)' : 'blur(2.4px)',
+            ease: 'none',
+          },
+          0,
+        )
+        .fromTo(
+          '.world-strip',
+          {
+            y: isMobileViewport ? 68 : 126,
+            scale: isMobileViewport ? 0.96 : 0.91,
+            autoAlpha: 0,
+            filter: isMobileViewport ? 'blur(3px)' : 'blur(7px)',
+            clipPath: 'inset(14% 0% 14% 0% round 12px)',
+          },
+          {
+            y: 0,
+            scale: 1,
+            autoAlpha: 1,
+            filter: 'blur(0px)',
+            clipPath: 'inset(0% 0% 0% 0% round 12px)',
+            ease: 'none',
+          },
+          0,
+        )
+        .fromTo(
+          '.world-strip__search',
+          {
+            y: 28,
+            autoAlpha: 0,
+            scale: 0.94,
+          },
+          {
+            y: 0,
+            autoAlpha: 1,
+            scale: 1,
+            ease: 'none',
+          },
+          0.22,
+        )
+
       gsap.to('.floating-world', {
         autoAlpha: 0,
         scrollTrigger: {
@@ -475,20 +629,6 @@ function App() {
           scrub: true,
         },
       })
-
-      gsap.fromTo(
-        '.floating-world',
-        { autoAlpha: 0 },
-        {
-          autoAlpha: 1,
-          scrollTrigger: {
-            trigger: '.signup-stage',
-            start: 'top 86%',
-            end: 'top 56%',
-            scrub: true,
-          },
-        },
-      )
 
       ScrollTrigger.create({
         trigger: '.signup-stage',
@@ -700,25 +840,33 @@ function App() {
         <section className="world-stage" data-reveal-group>
           <h2 data-reveal>Every search opens a new world.</h2>
           <div className="world-strip" data-reveal>
-            <img
-              src="https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200"
-              alt="Material inspiration left"
-              loading="lazy"
-              data-parallax="-5"
-            />
-            <img
-              src="https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200"
-              alt="Material inspiration center"
-              loading="lazy"
-              data-parallax="-5"
-            />
-            <img
-              src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200"
-              alt="Material inspiration right"
-              loading="lazy"
-              data-parallax="-5"
-            />
-            <div className="world-strip__search">future home</div>
+            {[0, 1, 2].map((columnIndex) => (
+              <div className="world-strip__column" key={`world-column-${columnIndex}`}>
+                <div
+                  className={`world-strip__track${worldSlideInstant ? ' world-strip__track--instant' : ''}`}
+                  style={{
+                    height: `${worldSlidesWithLoop.length * 100}%`,
+                    transform: `translateY(-${worldSlideIndex * worldSlidePercent}%)`,
+                    transitionDelay: worldSlideInstant ? '0s' : `${columnIndex}s`,
+                  }}
+                >
+                  {worldSlidesWithLoop.map((slide) => (
+                    <img
+                      key={`${slide.id}-${columnIndex}`}
+                      className="world-strip__image"
+                      style={{ height: `${100 / worldSlidesWithLoop.length}%` }}
+                      src={slide.images[columnIndex].src}
+                      alt={slide.images[columnIndex].alt}
+                      loading="lazy"
+                      data-parallax="-5"
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="world-strip__search" key={activeWorldSlide.id} aria-live="polite">
+              {activeWorldSlide.keyword}
+            </div>
           </div>
         </section>
 
@@ -782,11 +930,6 @@ function App() {
         </section>
 
         <section className="signup-stage" id="signup" data-reveal-group>
-          <div className="signup-core" data-reveal>
-            <p>Dream with us.</p>
-            <a className="cta-button" href="#hero">Get Quote</a>
-            <span>Download the app</span>
-          </div>
           <div className="footer-links" data-reveal>
             <span className="link-hover">Instagram</span>
             <span className="link-hover">Pinterest</span>
