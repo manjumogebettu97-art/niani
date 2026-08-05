@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import SpiralWhirlCanvas from './SpiralWhirlCanvas'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -226,18 +227,6 @@ const floatingObjects = [
   },
 ]
 
-const ambientDust = [
-  { id: 'dust-1', top: '7%', left: '39%', size: '22px', opacity: 0.2, blur: '2px' },
-  { id: 'dust-2', top: '14%', left: '47%', size: '18px', opacity: 0.15, blur: '1px' },
-  { id: 'dust-3', top: '19%', left: '58%', size: '24px', opacity: 0.14, blur: '3px' },
-  { id: 'dust-4', top: '32%', left: '41%', size: '15px', opacity: 0.17, blur: '1px' },
-  { id: 'dust-5', top: '44%', left: '53%', size: '27px', opacity: 0.13, blur: '3px' },
-  { id: 'dust-6', top: '55%', left: '44%', size: '19px', opacity: 0.18, blur: '2px' },
-  { id: 'dust-7', top: '61%', left: '57%', size: '16px', opacity: 0.19, blur: '1px' },
-  { id: 'dust-8', top: '73%', left: '49%', size: '23px', opacity: 0.15, blur: '2px' },
-  { id: 'dust-9', top: '84%', left: '54%', size: '17px', opacity: 0.18, blur: '1px' },
-]
-
 const thinkCards = [
   {
     id: 'material-palette',
@@ -329,6 +318,12 @@ const worldStripSlides = [
   },
 ]
 
+const spiralImageUrls = [
+  ...floatingObjects.filter((item) => item.type === 'image').map((item) => item.src),
+  ...thinkCards.map((card) => card.image),
+  ...worldStripSlides.flatMap((slide) => slide.images.map((image) => image.src)),
+]
+
 const WORLD_SLIDE_INTERVAL = 5000
 const WORLD_SLIDE_TRANSITION = 850
 const WORLD_COLUMN_STAGGER = 1000
@@ -343,7 +338,7 @@ const getIsMobileThinkCarousel = () => {
 
 function App() {
   const shellRef = useRef(null)
-  const floatingRefs = useRef([])
+  const heroSequenceRef = useRef(null)
   const rafRef = useRef(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -410,7 +405,7 @@ function App() {
   }, [isMobileThinkCarousel, thinkSlideInstant])
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2200)
+    const timer = setTimeout(() => setLoading(false), 5000)
     return () => clearTimeout(timer)
   }, [])
 
@@ -475,91 +470,21 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.set('.floating-world', { autoAlpha: 1 })
+    if (loading) return undefined
 
+    const ctx = gsap.context(() => {
       gsap.from('.main-nav', {
         y: -24,
         autoAlpha: 0,
-        duration: 1.4,
+        duration: 1,
         ease: 'power4.out',
       })
 
-      gsap.from('[data-hero-reveal]', {
-        y: 36,
+      gsap.from('.hero-copy__inner', {
         autoAlpha: 0,
-        stagger: 0.18,
-        duration: 1.6,
-        delay: 0.25,
+        scale: 0.93,
+        duration: 1,
         ease: 'power4.out',
-      })
-
-      const totalItems = floatingRefs.current.filter(Boolean).length
-      const orbits = []
-
-      floatingRefs.current.forEach((item, index) => {
-        if (!item) return
-        const depth = Number(item.dataset.depth || 1)
-
-        gsap.from(item, {
-          autoAlpha: 0,
-          scale: 0.85,
-          y: gsap.utils.random(15, 35),
-          duration: 2.2,
-          ease: 'power3.out',
-          delay: 0.3 + index * 0.06,
-        })
-
-        gsap.to(item, {
-          y: `+=${gsap.utils.random(-12, 12)}`,
-          x: `+=${gsap.utils.random(-10, 10)}`,
-          rotation: `+=${gsap.utils.random(-2, 2)}`,
-          duration: gsap.utils.random(8, 16),
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: 2.5 + index * 0.06,
-        })
-
-        orbits.push({
-          item,
-          offset: (index / totalItems) * Math.PI * 2,
-          radiusX: 30 + index * 8 * depth,
-          radiusY: 20 + index * 5 * depth,
-          direction: index % 2 === 0 ? 1 : -1,
-          depth,
-        })
-      })
-
-      let scrollProgress = 0
-
-      ScrollTrigger.create({
-        trigger: '.hero-stage',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: true,
-        onUpdate: (self) => {
-          scrollProgress = self.progress
-          orbits.forEach(({ item, offset, radiusX, radiusY, direction, depth }) => {
-            const t = scrollProgress * Math.PI * 4 * direction + offset
-            const x = Math.cos(t) * radiusX
-            const y = Math.sin(t) * radiusY
-            const rot = Math.sin(t) * 5 * depth
-            gsap.set(item, { x, y, rotation: rot })
-          })
-        },
-      })
-
-      gsap.utils.toArray('.ambient-dust').forEach((node) => {
-        gsap.to(node, {
-          x: gsap.utils.random(-16, 16),
-          y: gsap.utils.random(-20, 20),
-          scale: gsap.utils.random(0.86, 1.18),
-          duration: gsap.utils.random(9, 18),
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        })
       })
 
       gsap.utils.toArray('[data-reveal-group]').forEach((group) => {
@@ -598,20 +523,26 @@ function App() {
       })
 
       gsap.to('.hero-copy', {
-        scale: 0.72,
+        scale: 0.85,
         autoAlpha: 0,
         ease: 'none',
         scrollTrigger: {
-          trigger: '.hero-stage',
+          trigger: '.hero-film-sequence',
           start: 'top top',
-          end: 'bottom 60%',
-          scrub: 0.6,
+          end: () => `+=${Math.max(160, window.innerHeight * 0.18)}`,
+          scrub: true,
         },
       })
 
       gsap.fromTo(
         '.film-card',
-        { scale: 0.6, borderRadius: '32px' },
+        {
+          scale: () => {
+            const card = document.querySelector('.film-card')
+            return card ? Math.min(1, 600 / card.offsetWidth) : 0.52
+          },
+          borderRadius: '20px',
+        },
         {
           scale: 1,
           borderRadius: '18px',
@@ -681,32 +612,6 @@ function App() {
           0.22,
         )
 
-      gsap.to('.floating-world', {
-        autoAlpha: 0,
-        scrollTrigger: {
-          trigger: '.film-stage',
-          start: 'top 90%',
-          end: 'top 55%',
-          scrub: true,
-        },
-      })
-
-      ScrollTrigger.create({
-        trigger: '.signup-stage',
-        start: 'top bottom',
-        end: 'bottom bottom',
-        scrub: true,
-        onUpdate: (self) => {
-          orbits.forEach(({ item, offset, radiusX, radiusY, direction, depth }) => {
-            const t = self.progress * Math.PI * 4 * direction + offset
-            const x = Math.cos(t) * radiusX
-            const y = Math.sin(t) * radiusY
-            const rot = Math.sin(t) * 5 * depth
-            gsap.set(item, { x, y, rotation: rot })
-          })
-        },
-      })
-
       gsap.from('.wordmark', {
         scale: 0.85,
         autoAlpha: 0,
@@ -733,31 +638,20 @@ function App() {
       })
     }, shellRef)
 
-    const handlePointer = (event) => {
-      const xRatio = event.clientX / window.innerWidth - 0.5
-      const yRatio = event.clientY / window.innerHeight - 0.5
-      gsap.to('.floating-world', {
-        x: xRatio * 14,
-        y: yRatio * 10,
-        duration: 2.5,
-        ease: 'power3.out',
-      })
-    }
-
-    window.addEventListener('pointermove', handlePointer)
-
     return () => {
-      window.removeEventListener('pointermove', handlePointer)
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
     }
-  }, [])
+  }, [loading])
 
   return (
     <div className="niani-shell" ref={shellRef}>
       <div className={`splash-screen${loading ? '' : ' splash-screen--done'}`}>
-        <img src={`${import.meta.env.BASE_URL}niani-logo.jpeg`} alt="Niani Designs" className="splash-logo" />
-        <span className="splash-name">NIANI</span>
+        <div className="splash-loader" aria-label="Loading Niani Designs">
+          {Array.from({ length: 6 }, (_, index) => (
+            <span key={index} />
+          ))}
+        </div>
       </div>
 
       <header className={`main-nav${scrolled ? ' main-nav--scrolled' : ''}`}>
@@ -809,86 +703,62 @@ function App() {
       )}
 
       <div className="atmosphere-glow" aria-hidden="true" />
-      <div className="floating-world" aria-hidden="true">
-        <div className="floating-world__field">
-          {floatingObjects.map((item, index) => (
-            <article
-              key={item.id}
-              ref={(node) => {
-                floatingRefs.current[index] = node
-              }}
-              className={`floating-object floating-object--${item.type}`}
-              style={{
-                top: item.top,
-                left: item.left,
-                width: item.width,
-                height: item.height,
-                rotate: `${item.rotate}deg`,
-              }}
-              data-depth={item.depth}
-              aria-label={item.label}
-            >
-              <div className="floating-object__inner">
-                {item.type === 'image' ? (
-                  <img src={item.src} alt="" loading="lazy" />
-                ) : (
-                  <div className="floating-object__surface" style={item.style} />
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="floating-world__dust">
-          {ambientDust.map((dust) => (
-            <span
-              key={dust.id}
-              className="ambient-dust"
-              style={{
-                top: dust.top,
-                left: dust.left,
-                width: dust.size,
-                height: dust.size,
-                opacity: dust.opacity,
-                filter: `blur(${dust.blur})`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
 
       <main className="world-flow">
-        <section className="hero-stage" id="hero">
-          <div className="hero-copy">
-            <p className="hero-label" data-hero-reveal>
-              NIANI
-            </p>
-            <h1 className="hero-headline" data-hero-reveal>
-              <span>Your space</span>
-              <span>for interior inspiration.</span>
-            </h1>
-          </div>
-        </section>
-
-        <section className="film-stage" id="film" data-reveal-group>
-          <article className="film-card" data-reveal>
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              src={`${import.meta.env.BASE_URL}niani-video.mp4`}
-            />
-            <div className="film-overlay">
-              <div className="film-overlay__left">
-                <svg className="film-overlay__play" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
-                <span className="film-overlay__text">Watch</span>
-              </div>
-              <span className="film-overlay__text film-overlay__right">the film</span>
+        <div className="hero-film-sequence" ref={heroSequenceRef}>
+          <section className="hero-stage" id="hero">
+            <div className="spiral-whirl">
+              <SpiralWhirlCanvas
+                imageUrls={spiralImageUrls}
+                sequenceRef={heroSequenceRef}
+                onReady={() => setLoading(false)}
+              />
             </div>
-          </article>
-        </section>
+            <div className="hero-vignette" aria-hidden="true" />
+            <div className="hero-copy">
+              <div className="hero-copy__inner">
+                <img
+                  src={`${import.meta.env.BASE_URL}niani-logo.jpeg`}
+                  alt=""
+                  className="hero-brand-mark"
+                />
+                <p className="hero-label">NIANI</p>
+                <h1 className="hero-headline">
+                  <span>Your space</span>
+                  <span>for interior inspiration.</span>
+                </h1>
+                <div className="hero-actions">
+                  <a className="hero-pill cta-button" href="#signup">Get a quote</a>
+                  <a className="hero-outline" href="#film">Watch the film</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="film-stage" id="film" data-reveal-group>
+            <button className="film-prompt" type="button">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+              Watch our interior design film
+            </button>
+            <article className="film-card" data-reveal>
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                src={`${import.meta.env.BASE_URL}niani-video.mp4`}
+              />
+              <div className="film-overlay">
+                <div className="film-overlay__left">
+                  <svg className="film-overlay__play" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+                  <span className="film-overlay__text">Watch</span>
+                </div>
+                <span className="film-overlay__text film-overlay__right">the film</span>
+              </div>
+            </article>
+          </section>
+        </div>
 
         <section className="world-stage" data-reveal-group>
           <h2 data-reveal>Every search opens a new world.</h2>
@@ -903,9 +773,9 @@ function App() {
                     transitionDelay: worldSlideInstant ? '0s' : `${columnIndex}s`,
                   }}
                 >
-                  {worldSlidesWithLoop.map((slide) => (
+                  {worldSlidesWithLoop.map((slide, slideIndex) => (
                     <img
-                      key={`${slide.id}-${columnIndex}`}
+                      key={`${slide.id}-${columnIndex}-${slideIndex}`}
                       className="world-strip__image"
                       style={{ height: `${100 / worldSlidesWithLoop.length}%` }}
                       src={slide.images[columnIndex].src}
