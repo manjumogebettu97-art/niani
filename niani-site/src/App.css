@@ -550,6 +550,7 @@
 .film-card {
   position: sticky;
   top: 8.2rem;
+  display: block;
   width: 100%;
   margin: 0 auto;
   border-radius: 18px;
@@ -726,6 +727,7 @@
 
 .think-carousel__track {
   display: flex;
+  align-items: flex-start;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
@@ -811,6 +813,7 @@
 
 .know-card {
   position: relative;
+  width: 100%;
   border-radius: 12px;
   overflow: hidden;
   min-height: 430px;
@@ -818,6 +821,8 @@
 }
 
 .know-card img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -903,6 +908,12 @@
 
 .brand-logos span:hover {
   color: var(--brand);
+}
+
+@media (min-width: 761px) {
+  .brand-stage {
+    padding-top: clamp(7rem, 9vw, 9rem);
+  }
 }
 
 .signup-stage {
@@ -1190,7 +1201,8 @@
   }
 
   .think-card__media {
-    min-height: 270px;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
   }
 
   .know-stage {
@@ -1229,7 +1241,7 @@
   }
 
   .know-card img {
-    height: 56%;
+    height: 100%;
   }
 
   .know-card span {

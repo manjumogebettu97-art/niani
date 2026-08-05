@@ -3,6 +3,7 @@ import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import SpiralWhirlCanvas from './SpiralWhirlCanvas'
+import FilmGallery from './FilmGallery'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -729,18 +730,18 @@ function App() {
                 </h1>
                 <div className="hero-actions">
                   <a className="hero-pill cta-button" href="#signup">Get a quote</a>
-                  <a className="hero-outline" href="#film">Watch the film</a>
+                  <a className="hero-outline" href="#explore-films">Explore films</a>
                 </div>
               </div>
             </div>
           </section>
 
           <section className="film-stage" id="film" data-reveal-group>
-            <button className="film-prompt" type="button">
+            <a className="film-prompt" href="#explore-films">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
               Watch our interior design film
-            </button>
-            <article className="film-card" data-reveal>
+            </a>
+            <a className="film-card" href="#explore-films" data-reveal aria-label="Explore Niani films">
               <video
                 autoPlay
                 muted
@@ -756,7 +757,7 @@ function App() {
                 </div>
                 <span className="film-overlay__text film-overlay__right">the film</span>
               </div>
-            </article>
+            </a>
           </section>
         </div>
 
@@ -808,6 +809,8 @@ function App() {
               onMouseEnter={() => setThinkCarouselPaused(true)}
               onMouseLeave={() => setThinkCarouselPaused(false)}
               onTouchStart={() => setThinkCarouselPaused(true)}
+              onTouchEnd={() => setThinkCarouselPaused(false)}
+              onTouchCancel={() => setThinkCarouselPaused(false)}
             >
               <div
                 className={`think-carousel__track${thinkSlideInstant ? ' think-carousel__track--instant' : ''}`}
@@ -868,6 +871,8 @@ function App() {
             </p>
           </div>
         </section>
+
+        <FilmGallery embedded />
 
         <section className="brand-stage" data-reveal-group>
           <h3 data-reveal>Inspiration for the world's most refined spaces.</h3>
