@@ -44,3 +44,8 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # The site ships ~130 MB of reel video, so publishing to the Pages CDN
+          # runs past the action's 10-minute default. Raise until the videos are
+          # compressed or moved to a separate CDN.
+          timeout: 1800000
