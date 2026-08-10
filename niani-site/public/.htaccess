@@ -1,14 +1,22 @@
 # Client-side routing: serve index.html for any path that is not a real file
 # or directory, so /work, /contact and deep links resolve with a 200 instead of
 # a server 404. Real assets still hit disk normally.
+# Asset folders collide with routes: public/services/ is a real directory, so
+# /services and /services/<slug> would otherwise be captured by mod_dir (301 to
+# a trailing slash) and never reach React. Match on "not a real file" only, and
+# stop mod_dir from rewriting directory requests first.
+Options -Indexes
+DirectorySlash Off
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
   RewriteRule ^index\.html$ - [L]
 
+  # Files (including everything inside asset directories) still serve normally;
+  # any other path returns the app shell.
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
 </IfModule>
 
