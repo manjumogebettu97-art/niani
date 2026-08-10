@@ -27,6 +27,9 @@ jobs:
 
       - name: Install & Build
         working-directory: niani-site
+        env:
+          # Pages serves from the /niani/ subpath; nianidesigns.com serves from root.
+          VITE_BASE: /niani/
         run: |
           npm ci
           npm run build
