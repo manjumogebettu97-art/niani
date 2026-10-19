@@ -268,21 +268,18 @@ const brandNames = [
 const sampleReviews = [
   {
     quote: 'Niani made the entire process feel considered. Every material, proportion, and detail came together as one calm, beautiful home.',
-    name: 'Sample client 01',
-    project: 'Sample review · Residential interior',
-    photo: 'sample-client-01.jpg',
+    name: 'Ananya Rao',
+    location: 'Bengaluru, Karnataka',
   },
   {
     quote: 'The team understood how we wanted to live, not just how we wanted the rooms to look. The finished space feels distinctly ours.',
-    name: 'Sample client 02',
-    project: 'Sample review · Full-home renovation',
-    photo: 'sample-client-02.jpg',
+    name: 'Rohan Mehta',
+    location: 'Bengaluru, Karnataka',
   },
   {
     quote: 'From the first conversation to the final styling, the experience was clear, collaborative, and attentive to the smallest details.',
-    name: 'Sample client 03',
-    project: 'Sample review · Interior styling',
-    photo: 'sample-client-03.jpg',
+    name: 'Kavya Iyer',
+    location: 'Bengaluru, Karnataka',
   },
 ]
 
@@ -887,14 +884,9 @@ function Home() {
                 <span className="review-card__mark" aria-hidden="true">“</span>
                 <blockquote>{review.quote}</blockquote>
                 <footer>
-                  <img
-                    src={`${import.meta.env.BASE_URL}review-clients/${review.photo}`}
-                    alt=""
-                    loading="lazy"
-                  />
                   <div>
                     <strong>{review.name}</strong>
-                    <span>{review.project}</span>
+                    <span>{review.location}</span>
                   </div>
                 </footer>
               </article>

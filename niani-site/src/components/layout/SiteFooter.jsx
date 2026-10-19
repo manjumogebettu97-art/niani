@@ -13,7 +13,7 @@ function SiteFooter() {
       <footer className="site-legal">
         <span>© 2026 Niani Designs. All rights reserved.</span>
         <div className="site-legal__links" aria-label="Legal information">
-          <a href="tel:+917760180604">+91 77601 80604</a>
+          <a href="tel:+919663100640">+91 96631 00640</a>
           <Link to="/privacy">Privacy policy</Link>
           <Link to="/terms">Terms &amp; conditions</Link>
           <Link to="/cookies">Cookie policy</Link>

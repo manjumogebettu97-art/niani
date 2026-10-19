@@ -75,8 +75,8 @@ function SiteNav({ scrolled = false, menuOpen, onToggleMenu, onCloseMenu, onOpen
           ))}
           <button className="mobile-menu__cta" type="button" onClick={onOpenQuote}>Get Quote</button>
           <div className="mobile-menu__contact" aria-label="Contact Niani Designs">
-            <a href="tel:+917760180604">Call</a>
-            <a href="https://wa.me/917760180604" target="_blank" rel="noreferrer">WhatsApp</a>
+            <a href="tel:+919663100640">Call</a>
+            <a href="https://wa.me/919663100640" target="_blank" rel="noreferrer">WhatsApp</a>
           </div>
         </div>
       )}

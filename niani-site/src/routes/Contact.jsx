@@ -12,8 +12,8 @@ function Contact() {
       </figure>
       <section className="route-section route-contact-grid">
         <button type="button" onClick={() => setQuoteOpen(true)}><span>Project enquiry</span><strong>Open quote form ↗</strong></button>
-        <a href="https://wa.me/917760180604" target="_blank" rel="noreferrer"><span>WhatsApp</span><strong>+91 77601 80604 ↗</strong></a>
-        <a href="tel:+917760180604"><span>Call the studio</span><strong>+91 77601 80604 ↗</strong></a>
+        <a href="https://wa.me/919663100640" target="_blank" rel="noreferrer"><span>WhatsApp</span><strong>+91 96631 00640 ↗</strong></a>
+        <a href="tel:+919663100640"><span>Call the studio</span><strong>+91 96631 00640 ↗</strong></a>
       </section>
       {quoteOpen && <QuoteModal onClose={closeQuote} />}
     </PageShell>

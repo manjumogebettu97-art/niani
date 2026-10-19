@@ -57,7 +57,7 @@ function QuoteModal({ onClose }) {
       `Optional files: ${files.length ? `${files.join(', ')} (I will attach these in WhatsApp)` : 'Not provided'}`,
     ].join('\n')
 
-    const whatsAppUrl = `https://wa.me/917760180604?text=${encodeURIComponent(message)}`
+    const whatsAppUrl = `https://wa.me/919663100640?text=${encodeURIComponent(message)}`
     const whatsAppWindow = window.open(whatsAppUrl, '_blank')
     if (whatsAppWindow) whatsAppWindow.opener = null
     else window.location.assign(whatsAppUrl)
